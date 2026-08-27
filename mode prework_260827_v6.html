@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MODE Project Action Planning</title>
+<style>
+:root{
+  --bg:#0A0A0A;--card:#161616;--card2:#1E1E1E;--card3:#242424;--line:#2C2C2C;
+  --gold:#FFD200;--gold-dim:#8A7100;--white:#ECECEC;--grey:#C9C9C9;--dim:#9A9A9A;
+  --amber:#FFB800;--green:#3FB950;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--white);
+  font-family:"Pretendard","Malgun Gothic","맑은 고딕",-apple-system,BlinkMacSystemFont,sans-serif;
+  line-height:1.6;-webkit-font-smoothing:antialiased;padding-bottom:110px;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 20px}
+
+/* ── lang toggle ── */
+.langbar{display:flex;justify-content:flex-end;padding-top:22px}
+.langtoggle{display:inline-flex;background:var(--card2);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.langtoggle button{
+  background:none;border:none;color:var(--dim);padding:7px 15px;font-size:12px;
+  font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.04em;transition:.15s;
+}
+.langtoggle button.on{background:var(--gold);color:#0A0A0A}
+.langtoggle button:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+
+header{padding:22px 0 30px}
+h1{font-size:clamp(28px,4.4vw,38px);font-weight:800;letter-spacing:-.02em;line-height:1.2}
+h1 .gd{color:var(--gold)}
+.subtitle{font-size:14px;color:var(--grey);margin-top:8px}
+.subtitle .gd{color:var(--gold);font-weight:700}
+.rule{height:1px;background:var(--line);margin:26px 0 24px}
+.duration{display:inline-flex;align-items:center;gap:6px;background:var(--card2);
+  border:1px solid var(--line);border-radius:20px;padding:6px 14px;font-size:12px;
+  color:var(--gold);font-weight:600;margin-bottom:16px}
+.duration::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold)}
+.purpose{font-size:15px;color:var(--white);line-height:1.7;max-width:680px}
+.purpose + .purpose{margin-top:10px}
+
+.section-label{
+  font-size:11px;font-weight:700;letter-spacing:.14em;color:var(--gold);
+  text-transform:uppercase;margin:32px 0 12px;
+}
+.flow{display:flex;gap:6px;flex-wrap:wrap}
+.fstep{flex:1;min-width:120px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:11px 13px}
+.fstep.now{border-color:var(--gold);background:#211B00}
+.fn{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--dim)}
+.fstep.now .fn{color:var(--gold)}
+.ft{font-size:12.5px;font-weight:600;margin-top:4px;color:var(--grey);line-height:1.4}
+.fstep.now .ft{color:var(--white)}
+
+.wsbox{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 22px;margin-top:14px}
+.wsbox h3{font-size:13.5px;font-weight:700;color:var(--white);margin-bottom:10px}
+.wsbox ol{margin:0;padding-left:18px;color:var(--white);font-size:13.5px;line-height:1.85}
+.wsbox ol li::marker{color:var(--gold);font-weight:700}
+
+.axis{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 22px;
+  margin-top:14px;font-size:13.5px;color:var(--white);line-height:1.7}
+.axis .k{color:var(--gold);font-weight:700}
+.axis div + div{margin-top:6px}
+
+.namebox{margin-top:26px}
+.namebox label{display:block;font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px;letter-spacing:.04em}
+input[type=text]{width:100%;max-width:320px;background:var(--card2);border:1px solid var(--line);
+  color:var(--white);padding:12px 14px;border-radius:8px;font-size:14px;font-family:inherit}
+input[type=text]:focus,textarea:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:transparent}
+
+.pbar{position:sticky;top:0;z-index:50;background:rgba(10,10,10,.95);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);padding:12px 0;margin:30px 0 26px}
+.prow{display:flex;align-items:center;gap:14px}
+.ptrack{flex:1;height:5px;background:var(--card3);border-radius:3px;overflow:hidden}
+.pfill{height:100%;background:var(--gold);width:0%;transition:width .3s ease}
+.ptext{font-size:12px;color:var(--grey);white-space:nowrap;font-variant-numeric:tabular-nums}
+.ptext b{color:var(--gold)}
+
+.psec-head{display:flex;align-items:center;gap:10px;padding:20px 0 10px}
+.ptag{background:var(--gold);color:#0A0A0A;font-weight:800;font-size:11px;padding:4px 9px;border-radius:5px}
+.psec-title{font-size:15px;font-weight:700}
+
+.issue{background:var(--card);border:1px solid var(--line);border-radius:10px;
+  padding:20px 22px;margin-bottom:12px;transition:border-color .2s}
+.issue.done{border-color:var(--gold-dim)}
+.ihead{display:flex;align-items:flex-start;gap:11px}
+.inum{color:var(--dim);font-size:12px;font-weight:700;min-width:20px;padding-top:3px;font-variant-numeric:tabular-nums}
+.issue.done .inum{color:var(--gold)}
+.ititle{font-size:16px;font-weight:600;line-height:1.45}
+.idesc{font-size:13px;color:#D2D2D2;line-height:1.6;margin:7px 0 16px 31px;
+  padding-left:11px;border-left:2px solid var(--card3)}
+
+.qwrap{margin-left:31px}
+.qhint{font-size:12.5px;color:var(--gold);font-weight:600;margin-bottom:9px}
+.qmatrix{position:relative;padding:24px 92px 26px;max-width:760px}
+/* axis labels */
+.axlab{position:absolute;font-size:11px;font-weight:700;color:var(--white);letter-spacing:.03em;white-space:nowrap}
+.axlab.top{top:0;left:50%;transform:translateX(-50%)}
+.axlab.bottom{bottom:0;left:50%;transform:translateX(-50%)}
+.axlab.left{top:50%;left:0;transform:translateY(-50%)}
+.axlab.right{top:50%;right:0;transform:translateY(-50%)}
+.qplane{position:relative;display:grid;grid-template-columns:1fr 1fr;
+  grid-template-rows:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+/* cross axis lines */
+.qplane::before,.qplane::after{content:"";position:absolute;background:#ECECEC;z-index:2;pointer-events:none}
+.qplane::before{left:0;right:0;top:50%;height:2px;transform:translateY(-1px)}
+.qplane::after{top:0;bottom:0;left:50%;width:2px;transform:translateX(-1px)}
+.q{background:var(--card2);border:none;padding:16px 14px;cursor:pointer;text-align:center;
+  font-family:inherit;transition:.15s;min-height:92px;position:relative;z-index:1;
+  display:flex;flex-direction:column;align-items:center;justify-content:center}
+.q:hover{background:var(--card3)}
+.q:focus-visible{outline:2px solid var(--gold);outline-offset:-3px;z-index:3}
+.q[data-q="QW"] .q[data-q="MP"] .q[data-q="FI"] .q[data-q="RC"] .qname{font-size:13.5px;font-weight:800;color:var(--white);display:block}
+.qdesc{font-size:11.5px;color:#CFCFCF;margin-top:5px;line-height:1.45;display:block}
+.q.sel[data-q="QW"]{background:#3FB950}
+.q.sel[data-q="MP"]{background:#4C9AFF}
+.q.sel[data-q="FI"]{background:#C4C4C4}
+.q.sel[data-q="RC"]{background:#FFD200}
+.q.sel .q.sel .qname{color:#0A0A0A}
+.q.sel .qdesc{color:#1A1A1A}
+
+.rc{margin:16px 0 0 31px}
+.rc label{display:block;font-size:12.5px;color:var(--gold);font-weight:600;margin-bottom:7px}
+.rc label .req{color:var(--gold);margin-left:2px}
+textarea{width:100%;background:var(--card2);border:1px solid var(--line);color:var(--white);
+  padding:12px 14px;border-radius:8px;font-size:13.5px;font-family:inherit;resize:vertical;
+  min-height:66px;line-height:1.6}
+textarea::placeholder{color:#7A7A7A}
+
+.subbar{position:fixed;bottom:0;left:0;right:0;z-index:60;background:rgba(10,10,10,.96);
+  backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:14px 0}
+.srow{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.smsg{flex:1;font-size:13px;color:var(--grey);min-width:180px}
+.smsg.warn{color:var(--amber)}
+.smsg.ok{color:var(--green)}
+button.send{background:var(--gold);color:#0A0A0A;border:none;padding:13px 32px;border-radius:8px;
+  font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;transition:.15s}
+button.send:hover:not(:disabled){background:#FFE45C}
+button.send:disabled{background:var(--card3);color:var(--dim);cursor:not-allowed}
+button.send:focus-visible{outline:2px solid var(--white);outline-offset:2px}
+
+.done-screen{display:none;text-align:center;padding:90px 20px}
+.done-screen.show{display:block}
+.dmark{font-size:44px;color:var(--gold);margin-bottom:18px}
+.done-screen h2{font-size:24px;margin-bottom:12px}
+.done-screen p{color:var(--grey);font-size:15px;max-width:460px;margin:0 auto 8px}
+
+@media (max-width:640px){
+  .idesc,.qwrap,.rc{margin-left:0}
+  .qmatrix{padding:38px 0 26px;max-width:100%}
+  .axlab.left{top:14px;left:0;transform:none}
+  .axlab.right{top:14px;right:0;transform:none}
+  .axlab.top{top:0}
+  .axlab{font-size:10px}
+  .q{min-height:88px;padding:12px 12px 13px}
+  .qname{font-size:12.5px}
+  .qdesc{font-size:11px}
+  .axlab{font-size:9.5px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<div id="formView">
+  <div class="wrap">
+    <div class="langbar">
+      <div class="langtoggle" role="group">
+        <button type="button" id="btnKO" class="on" data-lang="ko">한국어</button>
+        <button type="button" id="btnEN" data-lang="en">English</button>
+      </div>
+    </div>
+
+    <header>
+      <h1><span class="gd">MODE</span> Project Action Planning</h1>
+      <div class="subtitle">
+        <span class="gd">M</span>arketing <span class="gd">O</span>rganization
+        <span class="gd">D</span>iagnostics &amp; <span class="gd">E</span>ffectiveness
+      </div>
+      <div class="rule"></div>
+
+      <div class="duration" id="tDuration"></div>
+      <p class="purpose" id="tPurpose1"></p>
+      <p class="purpose" id="tPurpose2"></p>
+
+      <div class="section-label" id="tProcLabel"></div>
+      <div class="flow" id="flowStrip"></div>
+
+      <div class="wsbox">
+        <h3 id="tAgendaTitle"></h3>
+        <ol id="agendaList"></ol>
+      </div>
+
+      <div class="section-label" id="tCriteriaLabel"></div>
+      <div class="axis">
+        <div><span class="k">Impact</span> <span id="tImpact"></span></div>
+        <div><span class="k">Effort</span> <span id="tEffort"></span></div>
+      </div>
+
+      <div class="namebox">
+        <label for="rname" id="tNameLabel"></label>
+        <input type="text" id="rname" autocomplete="name">
+      </div>
+    </header>
+  </div>
+
+  <div class="pbar">
+    <div class="wrap">
+      <div class="prow">
+        <div class="ptrack"><div class="pfill" id="pfill"></div></div>
+        <div class="ptext"><b id="pdone">0</b> <span id="tProgress"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap"><div id="issues"></div></div>
+</div>
+
+<div class="done-screen" id="doneView">
+  <div class="dmark">✓</div>
+  <h2 id="tDoneTitle"></h2>
+  <p id="tDoneMsg"></p>
+</div>
+
+<div class="subbar" id="subbar">
+  <div class="wrap">
+    <div class="srow">
+      <div class="smsg" id="smsg"></div>
+      <button class="send" id="sendBtn" disabled></button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══ CONFIG ══ */
+const ENDPOINT = "PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
+
+/* ══ UI STRINGS ══ */
+const UI = {
+  ko:{
+    purpose1:"조직 진단을 통해 도출된 16개 문제에 대해, 리더십의 판단을 사전에 수집합니다.<br>취합된 결과는 워크숍에서 우선순위 선정의 기초자료로 사용됩니다.",
+    purpose2:"",
+    procLabel:"Action Planning Process",
+    steps:[["STEP 1","Identify","문제 확인"],["STEP 2","Prioritize","우선순위 판단"],
+           ["STEP 3","Root Cause","근본 원인"],["STEP 4","Initiatives","기능 단위 과제"],
+           ["STEP 5","Deep-dive","팀·개인 단위"]],
+    agendaTitle:"워크숍에서 다룰 내용",
+    agenda:["취합된 우선순위 분포 확인 — 어떤 문제가 각 사분면에 모였는가",
+            "판단이 갈린 문제 논의 — 왜 다르게 보았는가",
+            "상위 문제의 근본 원인 분석 — Why Tree 전개",
+            "기능 단위 실행 과제 도출 및 성격·시점 분류",
+            "팀·개인 단위 딥다이브"],
+    criteriaLabel:"판단 기준",
+    impact:"— 이 문제를 해결했을 때 얻는 효과 (실행속도 개선, 이탈리스크 감소, 시간 효율성 증대)",
+    effort:"— 해결에 드는 부담 (자원, 시간, 조직 내 조정 난이도)",
+    duration:"소요 시간 약 20~30분",
+    nameLabel:"응답자",
+    namePlaceholder:"이름",
+    progress:"/ 16 완료",
+    qhint:"이 문제의 중요도와 해결 난이도를 판단해 주세요",
+    axImpactHigh:"Impact 높음", axImpactLow:"Impact 낮음",
+    axEffortHigh:"Effort 높음", axEffortLow:"Effort 낮음",
+    rcLabel:"그렇게 판단하신 배경과, 이 문제가 왜 생겼다고 보시는지 적어 주세요",
+    rcPlaceholder:"떠오르는 원인을 적어 주세요.",
+    submit:"제출하기", submitting:"제출 중...",
+    msgRemain:n=>`남은 문항 ${n}개 — 사분면 선택과 원인을 모두 입력해 주세요.`,
+    msgName:"맨 위에 이름을 입력해 주세요.",
+    msgReady:"모두 입력되었습니다. 제출할 수 있습니다.",
+    msgFail:"제출에 실패했습니다. 네트워크를 확인하고 다시 눌러 주세요.",
+    doneTitle:"제출되었습니다",
+    doneMsg:"응답이 저장되었습니다. 취합된 결과는 워크숍에서 함께 확인합니다."
+  },
+  en:{
+    purpose1:"We are collecting leadership's judgement in advance on the 16 issues identified through the organizational diagnosis.<br>The combined results will serve as the baseline for setting priorities in the workshop.",
+    purpose2:"",
+    procLabel:"Action Planning Process",
+    steps:[["STEP 1","Identify","Review issues"],["STEP 2","Prioritize","Set priority"],
+           ["STEP 3","Root Cause","Find causes"],["STEP 4","Initiatives","Functional level"],
+           ["STEP 5","Deep-dive","Team & individual"]],
+    agendaTitle:"Workshop Agenda",
+    agenda:["Review the combined priority distribution — which issues clustered in each quadrant",
+            "Discuss issues where judgements diverged — why we saw them differently",
+            "Analyse root causes of top issues — building the Why Tree",
+            "Derive functional-level initiatives and classify by type and timing",
+            "Deep-dive at team and individual level"],
+    criteriaLabel:"Criteria",
+    impact:"— the payoff if the issue is resolved (faster execution, lower attrition risk, better use of time)",
+    effort:"— the burden of resolving it (resources, time, difficulty of alignment across the organization)",
+    duration:"Takes about 20–30 minutes",
+    nameLabel:"Respondent",
+    namePlaceholder:"Your name",
+    progress:"/ 16 completed",
+    qhint:"Assess the importance and the difficulty of resolving this issue",
+    axImpactHigh:"Impact High", axImpactLow:"Impact Low",
+    axEffortHigh:"Effort High", axEffortLow:"Effort Low",
+    rcLabel:"Why did you judge it that way, and what do you see as the cause?",
+    rcPlaceholder:"Share the causes that come to mind.",
+    submit:"Submit", submitting:"Submitting...",
+    msgRemain:n=>`${n} issue${n>1?'s':''} remaining — select a box and add a cause for each.`,
+    msgName:"Please enter your name at the top.",
+    msgReady:"All set. You can submit now.",
+    msgFail:"Submission failed. Check your connection and try again.",
+    doneTitle:"Submitted",
+    doneMsg:"Your response has been saved. We will review the combined results together in the workshop."
+  }
+};
+
+/* ══ QUADRANTS ══ */
+const QUADS = {
+  QW:{impact:"H", effort:"L", ko:{name:"QUICK WIN", desc:"효과가 크고 비교적 수월함"},
+      en:{name:"QUICK WIN", desc:"High payoff, relatively easy"}},
+  MP:{impact:"H", effort:"H", ko:{name:"MAJOR PROJECT", desc:"효과가 크지만 부담도 큼"},
+      en:{name:"MAJOR PROJECT", desc:"High payoff, but demanding"}},
+  FI:{impact:"L", effort:"L", ko:{name:"FILL-IN", desc:"효과는 작지만 수월함"},
+      en:{name:"FILL-IN", desc:"Low payoff, but easy"}},
+  RC:{impact:"L", effort:"H", ko:{name:"RECONSIDER", desc:"효과는 작고 부담은 큼"},
+      en:{name:"RECONSIDER", desc:"Low payoff and demanding"}}
+};
+
+/* ══ ISSUES ══ */
+const GROUPS = [
+  {p:"P1", ko:"시간 배분", en:"Time Allocation", items:[
+    {n:1,
+     ko:{t:"체감–실제 근무시간 격차",
+         d:"기록된 근무시간보다 구성원이 체감하는 업무량이 더 큽니다. 마케팅 전체에서 이 격차가 나타나며, 조직마다 크기가 다릅니다."},
+     en:{t:"Gap between recorded and perceived work hours",
+         d:"Members perceive a heavier workload than their recorded hours suggest. The gap appears across marketing, and its size differs by organization."}},
+    {n:2,
+     ko:{t:"일부 조직의 장시간 근무",
+         d:"특정 조직에서 근무시간이 뚜렷하게 길게 나타납니다."},
+     en:{t:"Long working hours in some units",
+         d:"Working hours are markedly longer in certain units."}},
+    {n:3,
+     ko:{t:"일부 조직의 단시간 근무 (주 40시간 미만)",
+         d:"기록된 근무시간이 주 40시간에 못 미치는 조직도 있습니다. 업무 배분의 문제인지, 업무 성격의 차이인지, 기록의 정확도 문제인지 팀별로 검토가 필요합니다."},
+     en:{t:"Short working hours in some units (under 40h/week)",
+         d:"Some units record fewer than 40 hours per week. Whether this reflects workload distribution, the nature of the work, or recording accuracy needs to be reviewed team by team."}},
+    {n:4,
+     ko:{t:"보고자료 준비·운영 등 Low value work에 시간 잠식",
+         d:"보고자료 제작과 운영·행정 업무가 전체 시간의 상당 부분을 차지합니다. 그만큼 전략과 분석에 쓸 시간이 줄어듭니다."},
+     en:{t:"Time absorbed by low-value work such as reporting and operations",
+         d:"Deck preparation and operational or administrative work take up a substantial share of total time, leaving less room for strategy and analysis."}},
+    {n:5,
+     ko:{t:"팀 리더의 피플 매니지먼트 시간 부족",
+         d:"팀 리더가 구성원 관리와 육성에 쓰는 시간의 비중이 매우 낮습니다. 리더 역시 보고·운영 업무에 시간을 쓰고 있는 구조입니다."},
+     en:{t:"Insufficient people-management time for team leaders",
+         d:"Team leaders spend very little of their time managing and developing their members. Leaders too are absorbed by reporting and operational work."}}
+  ]},
+  {p:"P2", ko:"우선순위 정합", en:"Work Priority Alignment", items:[
+    {n:6,
+     ko:{t:"팀장–팀원의 Work Priority 불일치",
+         d:"같은 업무를 두고 팀장과 팀원의 인식이 어긋납니다. 무엇이 중요한지에 대해서는 대체로 일치하지만, 그 일이 얼마나 힘든지에 대한 인식 차이가 큽니다."},
+     en:{t:"Misalignment of work priorities between leaders and members",
+         d:"Leaders and members see the same work differently. They largely agree on what matters, but differ considerably on how demanding the work is."}},
+    {n:7,
+     ko:{t:"평균 대비 일치율이 극단적으로 낮은 팀 존재",
+         d:"평균 대비 일치율이 극단적으로 낮은 팀에 대한 명확한 진단 및 개선사항 도출이 필요합니다."},
+     en:{t:"Teams with extremely low alignment relative to the average",
+         d:"Teams whose alignment falls far below the average require a clear diagnosis and specific improvement actions."}}
+  ]},
+  {p:"P3", ko:"조직 병목", en:"Org Effectiveness", items:[
+    {n:8,
+     ko:{t:"업무에 도움이 되지 않는 조직의 공식 프로세스",
+         d:"보고 체계, 승인 단계, 업무 프로세스 등 공식 구조가 효율적인 업무 수행을 오히려 방해합니다. 조직효과성 6개 항목 중 가장 낮은 점수가 나온 영역으로, 프로세스 전반의 구조적 재정비가 필요한 부분입니다."},
+     en:{t:"Formal processes that hinder rather than support the work",
+         d:"Reporting lines, approval steps and work processes get in the way of doing the work efficiently. This scored lowest among the six organizational-effectiveness dimensions and points to a structural review of processes overall."}},
+    {n:9,
+     ko:{t:"개인의 동기를 부여하지 못하는 조직문화",
+         d:"조직의 문화와 관행이 구성원의 동기 유지와 에너지에 긍정적인 영향을 주지 못합니다. 의사결정 방식과 소통 관행이 주로 지적되었으며, 조직효과성 항목 중 두 번째로 낮습니다."},
+     en:{t:"Organizational culture that does not motivate",
+         d:"The culture and everyday practices do not sustain motivation or energy. Decision-making style and communication norms were the main points raised; this scored second lowest among the six dimensions."}},
+    {n:10,
+     ko:{t:"의사결정 번복 빈번",
+         d:"결정이 내려진 뒤 다시 뒤집히는 일이 반복됩니다. 거의 모든 부문의 주관식 응답에 등장한, 가장 광범위하게 나타난 동기 저하 요인입니다."},
+     en:{t:"Frequent decision reversals",
+         d:"Decisions are made and then overturned, repeatedly. This appeared in open-ended responses from almost every division — the most widespread driver of lost motivation."}},
+    {n:11,
+     ko:{t:"조직효과성 점수가 낮은 팀 집중",
+         d:"조직효과성 점수 역시 팀별 편차가 큽니다. 특정 팀에 병목이 집중되어 있습니다."},
+     en:{t:"Low org-effectiveness concentrated in specific teams",
+         d:"Organizational-effectiveness scores also vary widely by team, with bottlenecks concentrated in particular teams."}}
+  ]},
+  {p:"P4", ko:"현장 목소리", en:"Voice of Employee", items:[
+    {n:12,
+     ko:{t:"승인·구매 프로세스 복잡",
+         d:"비용 처리와 구매 절차, 다단계 결재의 복잡성이 여러 조직에서 반복적으로 지적되었습니다."},
+     en:{t:"Complex approval and purchasing processes",
+         d:"Expense handling, purchasing procedures and multi-step approvals were raised repeatedly across organizations."}},
+    {n:13,
+     ko:{t:"R&R 불명확",
+         d:"부서 간 역할과 책임의 경계가 명확하지 않습니다. 같은 업무에 여러 요청 경로가 존재하거나, 기준이 부서마다 다릅니다."},
+     en:{t:"Unclear roles and responsibilities",
+         d:"Boundaries of roles and responsibilities between teams are not clear. The same work arrives through several routes, and standards differ by department."}},
+    {n:14,
+     ko:{t:"온보딩 부재",
+         d:"신규 입사자를 위한 온보딩과 교육 체계가 부족합니다. 산업·제품 이해와 업무 매뉴얼의 부재가 함께 지적되었습니다."},
+     en:{t:"Lack of onboarding",
+         d:"Onboarding and training for new joiners are insufficient. Gaps in industry and product understanding, and the absence of work manuals, were both raised."}},
+    {n:15,
+     ko:{t:"AI 활용이 제한되어 반복업무에 시간 소모",
+         d:"AI 도구 접근이 제한되어 있습니다. 데이터 정리와 보고서 초안 작성처럼 AI로 처리 가능한 반복업무에 여전히 시간을 쓰고 있다는 의견이 여러 조직에서 나왔습니다."},
+     en:{t:"Limited AI access, with time lost to repetitive work",
+         d:"Access to AI tools is restricted. Several organizations noted that time still goes into repetitive work — data cleanup, first drafts of reports — that AI could handle."}},
+    {n:16,
+     ko:{t:"잦은 미팅",
+         d:"정기 미팅과 애드혹 미팅이 많고, 참석자와 아젠다가 중복되는 경우가 있습니다."},
+     en:{t:"Frequent meetings",
+         d:"There are many recurring and ad-hoc meetings, sometimes with overlapping attendees and agendas."}}
+  ]}
+];
+
+const TOTAL = 16;
+const answers = {};
+let lang = 'ko';
+
+/* ══ RENDER ══ */
+function render(){
+  const L = UI[lang];
+  document.documentElement.lang = lang;
+
+  document.getElementById('tDuration').textContent = L.duration;
+  document.getElementById('tPurpose1').innerHTML = L.purpose1;
+  const p2 = document.getElementById('tPurpose2');
+  p2.textContent = L.purpose2;
+  p2.style.display = L.purpose2 ? '' : 'none';
+  document.getElementById('tProcLabel').textContent = L.procLabel;
+  document.getElementById('tAgendaTitle').textContent = L.agendaTitle;
+  document.getElementById('tCriteriaLabel').textContent = L.criteriaLabel;
+  document.getElementById('tImpact').textContent = L.impact;
+  document.getElementById('tEffort').textContent = L.effort;
+  document.getElementById('tNameLabel').textContent = L.nameLabel;
+  document.getElementById('rname').placeholder = L.namePlaceholder;
+  document.getElementById('tProgress').textContent = L.progress;
+  document.getElementById('tDoneTitle').textContent = L.doneTitle;
+  document.getElementById('tDoneMsg').textContent = L.doneMsg;
+
+  document.getElementById('flowStrip').innerHTML = L.steps.map((s,i)=>
+    `<div class="fstep${(i===1||i===2)?' now':''}">
+       <div class="fn">${s[0]}</div><div class="ft">${s[1]}<br>${s[2]}</div></div>`).join('');
+
+  document.getElementById('agendaList').innerHTML = L.agenda.map(a=>`<li>${a}</li>`).join('');
+
+  const host = document.getElementById('issues');
+  host.innerHTML = '';
+  GROUPS.forEach(g=>{
+    const sec = document.createElement('div');
+    sec.innerHTML = `<div class="psec-head">
+        <span class="ptag">${g.p}</span>
+        <span class="psec-title">${lang==='ko'?g.ko:g.en}</span>
+      </div>`;
+    g.items.forEach(it=>{
+      const c = it[lang];
+      const el = document.createElement('div');
+      el.className = 'issue';
+      el.id = 'issue-'+it.n;
+      el.innerHTML = `
+        <div class="ihead">
+          <span class="inum">${String(it.n).padStart(2,'0')}</span>
+          <span class="ititle">${c.t}</span>
+        </div>
+        <div class="idesc">${c.d}</div>
+        <div class="qwrap">
+          <div class="qhint">${L.qhint}</div>
+          <div class="qmatrix">
+            <span class="axlab left">← ${L.axEffortLow}</span>
+            <span class="axlab top">${L.axImpactHigh} ↑</span>
+            <span class="axlab right">${L.axEffortHigh} →</span>
+            <span class="axlab bottom">${L.axImpactLow} ↓</span>
+            <div class="qplane" data-n="${it.n}">
+              ${['QW','MP','FI','RC'].map(id=>qbtn(id)).join('')}
+            </div>
+          </div>
+        </div>
+        <div class="rc">
+          <label for="rc-${it.n}">${L.rcLabel}<span class="req">*</span></label>
+          <textarea id="rc-${it.n}" data-n="${it.n}" placeholder="${L.rcPlaceholder}"></textarea>
+        </div>`;
+      sec.appendChild(el);
+    });
+    host.appendChild(sec);
+  });
+
+  // restore previous answers
+  Object.keys(answers).forEach(n=>{
+    const a = answers[n];
+    if(a.quad){
+      const b = document.querySelector(`#issue-${n} .q[data-q="${a.quad}"]`);
+      if(b) b.classList.add('sel');
+    }
+    if(a.cause){
+      const t = document.getElementById('rc-'+n);
+      if(t) t.value = a.cause;
+    }
+  });
+  update();
+}
+function qbtn(id){
+  const q = QUADS[id][lang];
+  return `<button type="button" class="q" data-q="${id}">
+    <span class="qname">${q.name}</span>
+    <span class="qdesc">${q.desc}</span>
+  </button>`;
+}
+
+/* ══ LANG TOGGLE ══ */
+document.querySelectorAll('.langtoggle button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    lang = b.dataset.lang;
+    document.querySelectorAll('.langtoggle button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    render();
+  });
+});
+
+/* ══ INTERACTION ══ */
+document.addEventListener('click', e=>{
+  const btn = e.target.closest('.q');
+  if(!btn) return;
+  const n = btn.closest('.qplane').dataset.n;
+  document.querySelectorAll(`#issue-${n} .q`).forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  answers[n] = answers[n] || {};
+  answers[n].quad = btn.dataset.q;
+  update();
+});
+document.addEventListener('input', e=>{
+  if(e.target.tagName!=='TEXTAREA') return;
+  const n = e.target.dataset.n;
+  answers[n] = answers[n] || {};
+  answers[n].cause = e.target.value.trim();
+  update();
+});
+document.getElementById('rname').addEventListener('input', update);
+
+function isDone(n){
+  const a = answers[n];
+  return !!(a && a.quad && a.cause && a.cause.length>0);
+}
+function update(){
+  const L = UI[lang];
+  let done = 0;
+  for(let n=1;n<=TOTAL;n++){
+    const c = document.getElementById('issue-'+n);
+    if(!c) continue;
+    if(isDone(n)){ done++; c.classList.add('done'); } else c.classList.remove('done');
+  }
+  document.getElementById('pdone').textContent = done;
+  document.getElementById('pfill').style.width = (done/TOTAL*100)+'%';
+
+  const name = document.getElementById('rname').value.trim();
+  const btn = document.getElementById('sendBtn');
+  const msg = document.getElementById('smsg');
+  btn.textContent = L.submit;
+  if(done < TOTAL){
+    btn.disabled = true; msg.className='smsg';
+    msg.textContent = L.msgRemain(TOTAL-done);
+  } else if(!name){
+    btn.disabled = true; msg.className='smsg warn';
+    msg.textContent = L.msgName;
+  } else {
+    btn.disabled = false; msg.className='smsg ok';
+    msg.textContent = L.msgReady;
+  }
+}
+
+/* ══ SUBMIT ══ */
+document.getElementById('sendBtn').addEventListener('click', async ()=>{
+  const L = UI[lang];
+  const btn = document.getElementById('sendBtn');
+  const msg = document.getElementById('smsg');
+  btn.disabled = true; btn.textContent = L.submitting;
+
+  const flat = GROUPS.flatMap(g=>g.items.map(it=>{
+    const a = answers[it.n];
+    const q = QUADS[a.quad];
+    return {
+      no: it.n, axis: g.p, issue: it.ko.t,
+      quadrant: q.ko.name, quadId: a.quad,
+      impact: q.impact, effort: q.effort,
+      cause: a.cause
+    };
+  }));
+
+  try{
+    await fetch(ENDPOINT,{
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify({
+        name: document.getElementById('rname').value.trim(),
+        language: lang,
+        submittedAt: new Date().toISOString(),
+        responses: flat
+      })
+    });
+    document.getElementById('formView').style.display='none';
+    document.getElementById('subbar').style.display='none';
+    document.getElementById('doneView').classList.add('show');
+    window.scrollTo(0,0);
+  }catch(err){
+    btn.disabled=false; btn.textContent=L.submit;
+    msg.className='smsg warn'; msg.textContent = L.msgFail;
+  }
+});
+
+render();
+</script>
+</body>
+</html>
